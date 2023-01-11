@@ -1,0 +1,9 @@
+function add(n1: number, n2: number, showResult: boolean) {
+  return showResult ? console.log(n1 + n2) : n1 + n2;
+}
+
+const number1 = 3;
+const number2 = 4;
+const printResult = false;
+
+add(number1, number2, printResult);
