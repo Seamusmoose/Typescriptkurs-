@@ -15,7 +15,7 @@ const testBool = (a: number, b: number, ifExists: Boolean) => {
   }
 };
 testBool(7, 6, true);
-console.log(result, "res");
+//console.log(result, "res");
 
 //number
 const test = (a: number, b: number) => a + b;
@@ -33,7 +33,7 @@ const person2 = {
   name: "jeff",
   age: 27,
 };
-console.log(person2.name);
+//console.log(person2.name);
 
 // arrays
 let arrayExample: string[]; // can only accept assignments of strings to the array
@@ -63,7 +63,7 @@ enum Role3 {
   readOnly = 5, // 5
   Author, // 6
 } // strings can also be assigned, but the following enum needs to have a value assigned for the other enums
-console.log(Role3.Admin);
+//console.log(Role3.Admin);
 
 // Union types
 const egFunc = (a: string | number, b: string | number) => {
@@ -101,9 +101,9 @@ const egFunc2 = (
   return result;
 };
 
-console.log(egFunc2(1, 3, "as-Number"));
-console.log(egFunc2("1", "4", "as-Number"));
-console.log(egFunc2("max", "harry", "as-Text"));
+//console.log(egFunc2(1, 3, "as-Number"));
+//console.log(egFunc2("1", "4", "as-Number"));
+//console.log(egFunc2("max", "harry", "as-Text"));
 
 // alias custom types - create your own specific custom type check to narrow your requirements. For example below a union type is used to make the code more readable
 type ExampleAlias = number | string;
@@ -128,7 +128,7 @@ const egFunc3 = (
 
 // void -if a function deliberately shouldn´t return anything use void
 const egFunc4 = (n1: number, n2: number): void => {
-  console.log(n1 + n2);
+  //console.log(n1 + n2);
 };
 // functions as types - create a function where the parameters have to match the functions type requirements exactly
 const egFunc5 = (n1: number, n2: number) => {
@@ -138,16 +138,17 @@ const egFunc5 = (n1: number, n2: number) => {
 let funcExample: (a: number, b: number) => number;
 funcExample = egFunc5;
 
-console.log(funcExample(8, 7));
+//console.log(funcExample(8, 7));
 
 // callback functions as types - use a callback as a parameter, to instruct a strict result on the logic of the function
-const addAndHandle = (n1: number, n2: number, cb: (num: number) => void) => { // cb is a parameter to set restrictions on what the cb function value can be
+const addAndHandle = (n1: number, n2: number, cb: (num: number) => void) => {
+  // cb is a parameter to set restrictions on what the cb function value can be
   const result = n1 + n2;
   cb(result);
 };
 
 addAndHandle(10, 20, (result) => {
-  console.log(result, "cb");
+  //console.log(result, "cb");
 });
 
 // unknown - the usecase for unknown is if you dont know the data type, however you know what type controls you will need after
@@ -160,11 +161,73 @@ if (typeof userInput === "string") {
 }
 
 // never - specifies clearly that this function never returns a value
-const generateError = (message: string, code: number): never => {
-  throw { message: message, errorCode: code };
-};
+//const generateError = (message: string, code: number): never => {
+//throw { message: message, errorCode: code };
+//};
 
-const res = generateError("an error occuured", 500);
-console.log(res);
+//const res = generateError("an error occuured", 500);
+//console.log(res);
 
 // any - can except any value, types are not checked, use as last resort
+
+// ----------------------- Classes and Interfaces  OOP-------------------------------
+
+// Objects - all data is stored in the objects
+// Classes - blueprints for  objects
+
+// basic class
+class Department {
+  name: string; // field/property of a class
+
+  constructor(n: string) {
+    // The constructor is executed when the object is being created, which ties the values to the object
+    this.name = n; // this sets the "name" property ^^to the value passed into the constructor. "updates the property value"
+  }
+
+  describe(this: Department) {
+    // adds extra type safety to the "this" keyword to protect from unwanted behaviours
+    console.log("this department is " + this.name); // refering to the global var
+  }
+}
+
+const accounting = new Department("Accounting");
+
+accounting.describe();
+
+// public and private Acess Modifiers
+// private - when a property is marked privated, it can only be altered from within the class
+class Department2 {
+  //public name: string; // public is the default, re-assignment is available outside of the class
+  private employees: string[] = [];
+
+  constructor(
+    private readonly id: number, // readonly added to id, cannot be changed after initialization
+    private name: string
+  ) {}
+
+  describe(this: Department2) {
+    console.log(`this department is ${this.name} with code ${this.id}`);
+  }
+
+  addEmployee(employee: string) {
+    this.employees.push(employee);
+  }
+
+  printEmployeeInfo() {
+    console.log(this.employees.length);
+    console.log(this.employees);
+    console.log(this.id);
+  }
+}
+const accounting2 = new Department2(21, "Accounting");
+
+// accounting2.employees[1] = "anna"; Doesnt work with private set, because you cannot edit outside of the class
+
+accounting2.addEmployee("max");
+accounting2.addEmployee("ted");
+
+accounting2.describe();
+accounting2.printEmployeeInfo();
+
+// ^^shorthand initialization - shorten the this.x syntax by passing everything together as params^^
+// ^^read only modifier - readonly labelled properties can only be initialized once
