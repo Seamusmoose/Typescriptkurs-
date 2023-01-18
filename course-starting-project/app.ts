@@ -1,3 +1,6 @@
+// things to revise:
+// Inheritance, singletons, instansiate
+
 // --------------------------------- Type basics and data Structures------------------------------
 
 // Strings
@@ -176,58 +179,198 @@ if (typeof userInput === "string") {
 // Classes - blueprints for  objects
 
 // basic class
-class Department {
-  name: string; // field/property of a class
+// class Department {
+//   name: string; // field/property of a class
 
-  constructor(n: string) {
-    // The constructor is executed when the object is being created, which ties the values to the object
-    this.name = n; // this sets the "name" property ^^to the value passed into the constructor. "updates the property value"
+//   constructor(n: string) {
+//     // The constructor is executed when the object is being created, which ties the values to the object
+//     this.name = n; // this sets the "name" property ^^to the value passed into the constructor. "updates the property value"
+//   }
+
+//   describe(this: Department) {
+//     // adds extra type safety to the "this" keyword to protect from unwanted behaviours
+//     console.log("this department is " + this.name); // refering to the global var
+//   }
+// }
+
+// const accounting = new Department("Accounting");
+
+// accounting.describe();
+
+// // public and private Acess Modifiers
+// // private - when a property is marked privated, it can only be altered from within the class
+// class Department2 {
+//   //public name: string; // public is the default, re-assignment is available outside of the class
+//   private employees: string[] = [];
+
+//   constructor(
+//     private readonly id: number, // readonly added to id, cannot be changed after initialization
+//     private name: string
+//   ) {}
+
+//   describe(this: Department2) {
+//     console.log(`this department is ${this.name} with code ${this.id}`);
+//   }
+
+//   addEmployee(employee: string) {
+//     this.employees.push(employee);
+//   }
+
+//   printEmployeeInfo() {
+//     console.log(this.employees.length);
+//     console.log(this.employees);
+//     console.log(this.id);
+//   }
+// }
+// const accounting2 = new Department2(21, "Accounting");
+
+// // accounting2.employees[1] = "anna"; Doesnt work with private set, because you cannot edit outside of the class
+
+// accounting2.addEmployee("max");
+// accounting2.addEmployee("ted");
+
+// accounting2.describe();
+// accounting2.printEmployeeInfo();
+
+// // ^^shorthand initialization - shorten the this.x syntax by passing everything together as params^^
+// // ^^read only modifier - readonly labelled properties can only be initialized once
+
+// // inheritance - "extends" keyword inherits from specified class (Department). Only one class can be inherited
+// class ITDepartment extends Department {
+//   admins: string[] // example of admins being only scoped to this class, however having it in the constructor is best practices
+//   // - if a constructor is not used within this class, then the original class constructor is used here
+//   constructor(id: string, admins: string[]) {
+//     // the "admins" array is only scoped to ths "ITDepartment"
+//     // whenever you add your own constructor, in a class that inherits from another class
+//     // super calls the constructor of the base class (Department)
+//     super(id); // the param is passed through the super
+//     this.admins = admins; // this.blah needs to always be after the super
+//   }
+// }
+
+// const accounting3 = new ITDepartment("21", ["max", "terry"]);
+// re-do classes
+
+// One clas for all course info
+// Benefits of OOP:
+// - work with "real life" entities
+// - each object represents a "real life" Object
+
+// classes - "blueprints for objects"
+// objects -  "things you work with within the code"
+
+// instances - "an object created is an instance of the class" (Like the output result of a template)
+abstract class DepartmentBluePrint {
+  //   private employees: string[] = [];
+  protected employees: string[] = []; // protected extends access to all extended classes of DepartmentBluePrint
+
+  constructor(protected readonly id: string, public name: string) {}
+
+  static createEmployee(name: string) {
+    // statically created object
+    return { name: name };
   }
 
-  describe(this: Department) {
-    // adds extra type safety to the "this" keyword to protect from unwanted behaviours
-    console.log("this department is " + this.name); // refering to the global var
-  }
-}
-
-const accounting = new Department("Accounting");
-
-accounting.describe();
-
-// public and private Acess Modifiers
-// private - when a property is marked privated, it can only be altered from within the class
-class Department2 {
-  //public name: string; // public is the default, re-assignment is available outside of the class
-  private employees: string[] = [];
-
-  constructor(
-    private readonly id: number, // readonly added to id, cannot be changed after initialization
-    private name: string
-  ) {}
-
-  describe(this: Department2) {
-    console.log(`this department is ${this.name} with code ${this.id}`);
-  }
+  abstract describe(this: DepartmentBluePrint): void;
 
   addEmployee(employee: string) {
     this.employees.push(employee);
   }
 
-  printEmployeeInfo() {
-    console.log(this.employees.length);
-    console.log(this.employees);
-    console.log(this.id);
+  printEmployeeInformation() {
+    console.log(this.employees.length, "employees array length");
+    console.log(this.employees, "employees array");
   }
 }
-const accounting2 = new Department2(21, "Accounting");
 
-// accounting2.employees[1] = "anna"; Doesnt work with private set, because you cannot edit outside of the class
+class ITDepartment extends DepartmentBluePrint {
+  // IT Department inherits the values from DepartmentBluePrint
+  constructor(id: string, public admins: string[]) {
+    super(id, "IT");
+  }
 
-accounting2.addEmployee("max");
-accounting2.addEmployee("ted");
+  describe() {
+    console.log(`IT Department - ID: ` + this.id);
+  }
+}
 
-accounting2.describe();
-accounting2.printEmployeeInfo();
+class AccountingDepartment extends DepartmentBluePrint {
+  private lastReport: string;
+  private static instance: AccountingDepartment;
 
-// ^^shorthand initialization - shorten the this.x syntax by passing everything together as params^^
-// ^^read only modifier - readonly labelled properties can only be initialized once
+  // A getter is a property where you execute a function or a method, when you retrieve a value to add extra logic
+  get mostRecentReport() {
+    // a getter always has to return something
+    if (this.lastReport) {
+      return this.lastReport;
+    }
+
+    throw new Error("No report foundd");
+  }
+
+  set mostRecentReport(value: string) {
+    if (!value) {
+      throw new Error("Please pass a valid value");
+    }
+    this.addReport(value);
+  }
+
+  private constructor(id: string, private reports: string[]) {
+    super(id, "Accounting");
+    this.lastReport = reports[0];
+  }
+
+  static getInstance() {
+    if (AccountingDepartment.instance) {
+      return this.instance;
+    }
+    this.instance = new AccountingDepartment("A2", []);
+    return this.instance;
+  }
+
+  describe() {
+    console.log(`Accounting department - ID: ` + this.id);
+  }
+
+  addEmployee(name: string) {
+    if (name === "max") {
+      return;
+    }
+    this.employees.push(name);
+  }
+
+  addReport(text: string) {
+    this.reports.push(text);
+    this.lastReport = text;
+  }
+
+  printReports() {
+    console.log(this.reports);
+  }
+}
+
+const employee1 = DepartmentBluePrint.createEmployee("Ani");
+console.log(employee1);
+
+const it = new ITDepartment("IT1", ["tim", "thomas"]);
+it.addEmployee("Jim");
+it.addEmployee("James");
+it.describe();
+it.printEmployeeInformation();
+
+// const accounting = new AccountingDepartment("A1", []);
+const accounting = AccountingDepartment.getInstance();
+accounting.addReport("Something went wrong...");
+accounting.mostRecentReport = "Year end report";
+console.log(accounting.mostRecentReport, "most recent report");
+accounting.addEmployee("max");
+accounting.addEmployee("meredith");
+
+// accounting.printReports();
+// accounting.printEmployeeInformation();
+accounting.describe();
+
+console.log(it, "ITTTT");
+console.log(accounting, "ACC");
+
+// -------------- Interfaces ---------
