@@ -278,8 +278,8 @@ abstract class DepartmentBluePrint {
   }
 
   printEmployeeInformation() {
-    console.log(this.employees.length, "employees array length");
-    console.log(this.employees, "employees array");
+    //console.log(this.employees.length, "employees array length");
+    //console.log(this.employees, "employees array");
   }
 }
 
@@ -290,7 +290,7 @@ class ITDepartment extends DepartmentBluePrint {
   }
 
   describe() {
-    console.log(`IT Department - ID: ` + this.id);
+    //console.log(`IT Department - ID: ` + this.id);
   }
 }
 
@@ -329,7 +329,7 @@ class AccountingDepartment extends DepartmentBluePrint {
   }
 
   describe() {
-    console.log(`Accounting department - ID: ` + this.id);
+    //console.log(`Accounting department - ID: ` + this.id);
   }
 
   addEmployee(name: string) {
@@ -345,12 +345,12 @@ class AccountingDepartment extends DepartmentBluePrint {
   }
 
   printReports() {
-    console.log(this.reports);
+    //console.log(this.reports);
   }
 }
 
 const employee1 = DepartmentBluePrint.createEmployee("Ani");
-console.log(employee1);
+//console.log(employee1);
 
 const it = new ITDepartment("IT1", ["tim", "thomas"]);
 it.addEmployee("Jim");
@@ -362,7 +362,7 @@ it.printEmployeeInformation();
 const accounting = AccountingDepartment.getInstance();
 accounting.addReport("Something went wrong...");
 accounting.mostRecentReport = "Year end report";
-console.log(accounting.mostRecentReport, "most recent report");
+//console.log(accounting.mostRecentReport, "most recent report");
 accounting.addEmployee("max");
 accounting.addEmployee("meredith");
 
@@ -370,7 +370,48 @@ accounting.addEmployee("meredith");
 // accounting.printEmployeeInformation();
 accounting.describe();
 
-console.log(it, "ITTTT");
-console.log(accounting, "ACC");
+//console.log(it, "ITTTT");
+//console.log(accounting, "ACC");
 
 // -------------- Interfaces ---------
+// if you want to work with an object, use an interface"
+
+//type addFn = (a: number, b: number) => number;
+interface addFn {
+  (a: number, b: number): number;
+}
+
+let add: addFn;
+
+add = (n1: number, n2: number) => n1 + n2;
+
+interface Named {
+  readonly name?: string;
+  outputName?: string;
+}
+
+interface Greetable extends Named {
+  greet(phrase: string): void;
+}
+
+class Person implements Greetable {
+  name?: string;
+  age = 30;
+
+  constructor(n?: string) {
+    if (n) {
+      this.name = n;
+    }
+  }
+
+  greet(phrase: string) {
+    if (this.name) {
+      console.log(`${phrase} ${this.name}`);
+    }
+    console.log("hi");
+  }
+}
+
+let user1: Greetable;
+user1 = new Person("max");
+user1.greet("Hi there - I am");
