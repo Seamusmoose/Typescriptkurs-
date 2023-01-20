@@ -406,12 +406,182 @@ class Person implements Greetable {
 
   greet(phrase: string) {
     if (this.name) {
-      console.log(`${phrase} ${this.name}`);
+      //console.log(`${phrase} ${this.name}`);
     }
-    console.log("hi");
+    //console.log("hi");
   }
 }
 
 let user1: Greetable;
 user1 = new Person("max");
 user1.greet("Hi there - I am");
+
+// ------------ advanced typying concepts -------------------
+
+type Admin = {
+  name: string;
+  privileges: string[];
+};
+
+type Employee = {
+  name: string;
+  startDate: Date;
+};
+
+type ElevatedEmployee = Admin & Employee; // combines the types
+// interfaces can also be used, however types in this case are cleaner and shorter
+
+const e1: ElevatedEmployee = {
+  name: "Max",
+  privileges: ["create-server"],
+  startDate: new Date(),
+};
+
+// intersection types - review this
+// type Combinable = string | number;
+// type Numeric = number | boolean;
+
+// type universal = Combinable | Numeric;
+
+type UnknownEmployee = Employee | Admin;
+// type Guards - the checker does not know if privildges exists or not, as Employee and Admin have different values
+function printEmployeeInformation(emp: UnknownEmployee) {
+  //console.log(`Name: ` + emp.name);
+  if ("privileges" in emp) {
+    // "in" detects if the specified string is a property of "Employee"
+    //console.log(`Priviledges ` + emp.privileges);
+  }
+
+  if ("startDate" in emp) {
+    //console.log(`Priviledges ` + emp.startDate);
+  }
+}
+printEmployeeInformation(e1);
+printEmployeeInformation({ name: "Jim", startDate: new Date() }); // also works without errors, just excludes priviledges
+
+class Car {
+  drive() {
+    //console.log("driving... c");
+  }
+}
+
+class Truck {
+  drive() {
+    //console.log("driving....T");
+  }
+
+  loadCargo(amount: number) {
+    //console.log("loading cargo: " + amount);
+  }
+}
+
+type vehicle = Car | Truck;
+
+const v1 = new Car();
+const v2 = new Truck();
+
+function useVehicle(vehicle: vehicle) {
+  vehicle.drive();
+  if (vehicle instanceof Truck) {
+    // type guards check if this instance of vehicle, was based on the truck contructor function
+    vehicle.loadCargo(10000);
+  }
+}
+
+useVehicle(v1);
+useVehicle(v2);
+
+// type guards: descriminated union
+
+interface Bird {
+  type: "bird"; // this is a literal type, not a typescript type
+  flyingSpeed: number;
+}
+
+interface Horse {
+  type: "horse";
+  runningSpeed: number;
+}
+
+type Animal = Bird | Horse;
+
+function moveAnimal(animal: Animal) {
+  let speed;
+  switch (animal.type) {
+    case "bird":
+      speed = animal.flyingSpeed;
+      break;
+    case "horse":
+      speed = animal.runningSpeed;
+  }
+  console.log(`current animal speed: ${speed}`);
+}
+
+moveAnimal({ type: "bird", flyingSpeed: 20 });
+
+// typescript requires the element to be specified, as typescript doesn´t know if it exists or not
+const i = <HTMLInputElement>document.getElementById("user-input");
+
+// below is the alternative syntax
+const i2 = document.getElementById("user-input"); // as HTMLInputElement;
+i.value = "hi";
+
+if (i2) {
+  // if a null check is needed, create an if statement with the element check in brackets, before the value
+  (i2 as HTMLInputElement).value = "hello";
+}
+
+interface ErrorContainer {
+  // email: "not a valid email", username: "Must start with a capital letter"
+  // boolean here is not allowed
+  id: string; // now all parameters passed through the error container need an id, but importantly the type can only be string, because the array below is an index type, so the other propertys have to conform
+  [prop: string]: string; // this is saying, I dont know the property name or the property count, but the property and value must be a string
+}
+
+const errorBag: ErrorContainer = {
+  id: "1",
+  email: "not a valid email",
+  //   1: "not a valid email", // this could also work as well, as this number can also be interpreted as a string
+  username: "Must start with a capital letter",
+};
+
+type Combinable = string | number;
+type Numeric = number | boolean;
+
+type universal = Combinable | Numeric;
+
+// here you can specify what to output, with specific cases of the function parameters
+// this is called fuctional overloads
+function addUnion(a: number, b: number): number;
+function addUnion(a: string, b: string): string;
+function addUnion(a: number, b: string): string;
+function addUnion(a: string, b: number): string;
+
+function addUnion(a: Combinable, b: Combinable) {
+  if (typeof a === "string" || typeof b === "string") {
+    return a.toString() + b.toString();
+  }
+  return a + b;
+}
+
+const resultUnion = addUnion("max", "blah");
+//resultUnion.split("") // typescript doesnt know if resultUnion holds a number or string so this wont work
+
+// optional chaining
+
+const fetchedUserData = {
+  id: 1,
+  name: "seb",
+  job: { title: "CEO", description: "my Company" },
+};
+
+console.log(fetchedUserData?.job?.title); // using if checks by chaining question marks, will stop a run time error while checking if the value exists
+
+// null coalescing
+const userInput2 = null;
+
+// if the first value is "falsy" the OR operator assigns the second default value
+const storedData = userInput2 || "Default"; // however if the inputvalue is "" for example, that is also falsy so this approach is incorrect
+
+// using the nullish coalescing operator is a better solution, as its only falsy values are undefined or null, 0 and "" will be truthy
+const storedData2 = userInput2 ?? "Default";
