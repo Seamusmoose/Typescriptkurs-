@@ -615,3 +615,5 @@ function merge<T, U>(obA: T, obB: U) {
 const mergedObj = merge({ name: "jim" }, { age: 30 }); // typescript infers the type of values we are passing as arguments, however the data types can also be specified in the fuction call if needed
 // mergedObj.name // typescript doesnt expect this value returned, it is expected an object
 console.log(mergedObj.age);
+
+const test2 = "t"
