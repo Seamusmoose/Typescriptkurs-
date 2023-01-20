@@ -585,3 +585,33 @@ const storedData = userInput2 || "Default"; // however if the inputvalue is "" f
 
 // using the nullish coalescing operator is a better solution, as its only falsy values are undefined or null, 0 and "" will be truthy
 const storedData2 = userInput2 ?? "Default";
+
+// ------------------ generics --------------------
+
+const names: Array<string> = ["max", "jeff"]; // a generic type, is a type connected to another type i.e Array-string, so typescript can be more precise
+
+// promise type
+const promise: Promise<Number> = new Promise((resolve, reject) => {
+  // specifiying what this promise will return with a generic type, will catch issues immediately like below
+  setTimeout(() => {
+    resolve(10);
+    //resolve("promise returned");
+  }, 2000);
+});
+
+//promise.then((data) => data.split("")); // if any type had been used above, this would not be controlled, if the wrong type is provided then an error is thrown
+promise.then((data) => data.toString()); // Works
+// basically generic types help you to get addition type information with more complicated functions, classes etc. "does something with the data that is coming in"
+
+// create your own generic type
+// generic function
+
+function merge<T, U>(obA: T, obB: U) {
+  // basically saying both are of any type, but they will be different
+  // with generic types, we are telling typescript, that the provided T;U parameters will be of different types, that we will have two different kinds of data that could return an intersection
+  return { ...obA, ...obB };
+}
+
+const mergedObj = merge({ name: "jim" }, { age: 30 }); // typescript infers the type of values we are passing as arguments, however the data types can also be specified in the fuction call if needed
+// mergedObj.name // typescript doesnt expect this value returned, it is expected an object
+console.log(mergedObj.age);
