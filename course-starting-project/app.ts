@@ -616,4 +616,109 @@ const mergedObj = merge({ name: "jim" }, { age: 30 }); // typescript infers the 
 // mergedObj.name // typescript doesnt expect this value returned, it is expected an object
 console.log(mergedObj.age);
 
-const test2 = "t"
+// working with constraints
+function merge2<T extends object, U extends object>(obA: T, obB: U) {
+  // now a strict object constraint is added
+  return { ...obA, ...obB };
+}
+
+const mergedObj2 = merge(
+  { name: "jim", hobbies: ["sport", "cooking"] },
+  { age: 30 }
+);
+
+interface Lengthy {
+  length: number;
+}
+
+// another generic type
+function countAndDescribe<T extends Lengthy>(element: T): [T, string] {
+  let description = "Got no value";
+  if (element.length > 0) {
+    // without the lengthy interface check, typescript throws errors because it cannot confirm a length
+    description = `has ${element.length} elements`;
+  }
+
+  return [element, description]; //tuple
+}
+
+console.log(countAndDescribe("hi there"));
+
+// the keyof contraint
+function extractAndConvert<T extends object, U extends keyof T>(
+  obj: T,
+  key: U
+) {
+  // T specifies it must be an object, and using keyof, U specifies it must be a Key value of T
+  return obj[key];
+}
+// this specific kind of keyof check, helps to avoid easy mistakes, like trying to access a property that doesnt exist
+extractAndConvert({ name: "max" }, "name");
+
+// generic classes
+
+class DataStorage<T extends string | number | boolean> {
+  private data: T[] = [];
+
+  addItem(item: T) {
+    this.data.push(item);
+  }
+
+  removeItem(item: T) {
+    this.data.splice(this.data.indexOf(item), 1);
+  }
+
+  getItems() {
+    return [...this.data];
+  }
+}
+
+const textStorage = new DataStorage<string>();
+textStorage.addItem("test");
+textStorage.addItem("jeff");
+textStorage.removeItem("test");
+
+console.log(textStorage.getItems());
+
+const numberStorage = new DataStorage<number>();
+numberStorage.addItem(2);
+numberStorage.addItem(7);
+numberStorage.removeItem(2);
+
+console.log(numberStorage.getItems());
+
+// const objStorage = new DataStorage<object>(); // this will not work as objects were not specified, this is why tighter controls are nessesary
+// objStorage.addItem({ name: "manu" });
+// objStorage.addItem({ name: "max" });
+// objStorage.removeItem({ name: "manu" });
+
+// console.log(objStorage.getItems());
+
+// utility generic types
+
+interface CourseGoal {
+  title: string;
+  description: string;
+  completeUntil: Date;
+}
+
+function createCourseGoal(
+  title: string,
+  description: string,
+  date: Date
+): CourseGoal {
+  let courseGoal: Partial<CourseGoal> = {}; // the partial Utility wraps our own type, and creates an object type where the properties are optional?
+  // to summarise: this allows us to have the object empty initially, then add the properties after
+  courseGoal.title = title;
+  courseGoal.description = description;
+  courseGoal.completeUntil = date;
+  return courseGoal as CourseGoal; // the return needs to be type casted, because typescript still registers the object as "Partial" instead of as CourseGoal
+}
+
+// Readonly
+const names2: Readonly<string[]> = ["mark", "jeff"];
+//names2.push("jack") // wont work because it has been marked Readonly
+
+// Union types vs Generic types
+// (flexible with types) Union types are perfect if you want different types to be passed into your function i.e string | boolean | number
+// (strict with types) Generic types are perfect if you want to use the same type throught your class or function that u create
